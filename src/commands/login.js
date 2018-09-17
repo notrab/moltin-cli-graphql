@@ -1,16 +1,16 @@
-const prompts = require('prompts')
-const { cyan, green } = require('chalk')
-const debug = require('debug')('moltin')
+import prompts from 'prompts'
+import { cyan, green } from 'chalk'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { success, info, error } = require('../utils/log')
+import debug from '../utils/debugger'
+import moltin from '../utils/moltin'
+import config from '../utils/config'
+import { success, info, error } from '../utils/log'
 
 import {
   login as loginMutation,
   switchStore as switchMutation
 } from '../mutations'
-import { stores as storesQuery } from '../queries'
+import { getStores as getStoresQuery } from '../queries'
 
 export default async options => {
   prompts.inject(options)
@@ -52,7 +52,7 @@ export default async options => {
     debug('Getting all stores')
     const {
       stores: [{ noneUuid, name }]
-    } = await moltin.request(storesQuery)
+    } = await moltin.request(getStoresQuery)
 
     activeStoreId = noneUuid
     activeStoreName = name

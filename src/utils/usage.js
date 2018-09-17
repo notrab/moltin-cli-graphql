@@ -19,8 +19,5 @@ ${cyan(bold('Commands:'))}
   register            ${dim('Register a new Moltin account')}
   dashboard           ${dim('Open the Moltin dashboard')}
 
-${cyan(bold('Options:'))}
-  -id, --store-id     ${dim('Override your current active store')}
-
 See ${cyan('https://bit.ly/moltin-cli')} for documentation.
 `

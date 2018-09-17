@@ -1,31 +1,18 @@
-const prompts = require('prompts')
-const { cyan } = require('chalk')
-const debug = require('debug')('moltin')
+import prompts from 'prompts'
+import { cyan } from 'chalk'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { success, error } = require('../utils/log')
+import debug from '../utils/debugger'
+import moltin from '../utils/moltin'
+import config from '../utils/config'
+import { success, error } from '../utils/log'
+import { getStores as getStoresQuery } from '../queries'
+import { switchStore as switchStoreMutation } from '../mutations'
 
-const query = `query getStores {
-  stores {
-    id
-    noneUuid
-    name
-  }
-}
-`
-
-const mutation = `mutation switchStore($activeStoreId: ID!) {
-  switchStore(id: $activeStoreId) {
-    success
-  }
-}`
-
-module.exports = async options => {
+export default async options => {
   prompts.inject(options)
 
   debug('Getting all stores for prompt')
-  const { stores } = await moltin.request(query)
+  const { stores } = await moltin.request(getStoresQuery)
 
   const { id: activeStoreId } = await prompts({
     type: 'select',
@@ -43,7 +30,9 @@ module.exports = async options => {
     process.exit(1)
   }
 
-  const { switchStore } = await moltin.request(mutation, { activeStoreId })
+  const { switchStore } = await moltin.request(switchStoreMutation, {
+    activeStoreId
+  })
 
   if (!switchStore.success) {
     error('Unable to switch')

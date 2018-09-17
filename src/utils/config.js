@@ -1,4 +1,4 @@
-const Conf = require('conf')
+import Conf from 'conf'
 
 const config = new Conf()
 

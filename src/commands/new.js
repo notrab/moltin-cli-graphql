@@ -1,25 +1,16 @@
-const prompts = require('prompts')
-const { cyan } = require('chalk')
-const debug = require('debug')('moltin')
+import prompts from 'prompts'
+import { cyan } from 'chalk'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { success, error } = require('../utils/log')
+import debug from '../utils/debugger'
+import moltin from '../utils/moltin'
+import config from '../utils/config'
+import { success, error } from '../utils/log'
+import {
+  createStore as createStoreMutation,
+  switchStore as switchStoreMutation
+} from '../mutations'
 
-const mutation = `mutation createStore($name: String!) {
-  createStore(name: $name) {
-    id: noneUuid
-    name
-  }
-}`
-
-const switchMutation = `mutation switchStore($activeStoreId: ID!) {
-  switchStore(id: $activeStoreId) {
-    success
-  }
-}`
-
-module.exports = async options => {
+export default async options => {
   prompts.inject(options)
 
   const { name, confirm } = await prompts([
@@ -31,7 +22,7 @@ module.exports = async options => {
     {
       type: 'confirm',
       name: 'confirm',
-      message: (prev, values) =>
+      message: (_, values) =>
         `You are about to create a new store ${cyan(
           values.name
         )} - Are you sure?`,
@@ -50,7 +41,7 @@ module.exports = async options => {
   }
 
   debug('Running mutation to create store')
-  const { createStore } = await moltin.request(mutation, { name })
+  const { createStore } = await moltin.request(createStoreMutation, { name })
   success(`${createStore.name} was created successfully.`)
 
   debug('Setting user config')
@@ -59,7 +50,7 @@ module.exports = async options => {
     activeStoreName: createStore.name
   })
 
-  const { switchStore } = await moltin.request(switchMutation, {
+  const { switchStore } = await moltin.request(switchStoreMutation, {
     activeStoreId: createStore.id
   })
 

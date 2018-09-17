@@ -1,18 +1,13 @@
-const prompts = require('prompts')
-const { cyan } = require('chalk')
-const debug = require('debug')('moltin')
+import prompts from 'prompts'
+import { cyan } from 'chalk'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { success, error } = require('../utils/log')
+import debug from '../utils/debugger'
+import moltin from '../utils/moltin'
+import config from '../utils/config'
+import { success, error } from '../utils/log'
+import { renameStore } from '../mutations'
 
-const mutation = `mutation rename($storeId: ID!, $name: String!) {
-  updateStore(id: $storeId, name: $name) {
-    name
-  }
-}`
-
-module.exports = async options => {
+export default async options => {
   const storeId = options.id || (await config.get('activeStoreId'))
 
   if (!storeId) {
@@ -48,11 +43,13 @@ module.exports = async options => {
     process.exit(1)
   }
 
-  debug('Running mutation to update store')
-  const { updateStore } = await moltin.request(mutation, { storeId, name })
+  debug('Running renameStore mutation to update store')
+  const { updateStore } = await moltin.request(renameStore, { storeId, name })
 
   debug('Setting user config')
   await config.set({
     activeStoreName: updateStore.name
   })
+
+  success(`Store renamed to ${cyan(name)}`)
 }

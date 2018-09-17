@@ -1,18 +1,12 @@
-const Table = require('cli-table')
-const debug = require('debug')('moltin')
+import Table from 'cli-table'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { info, error } = require('../utils/log')
+import debug from '../utils/debugger'
+import moltin from '../utils/moltin'
+import config from '../utils/config'
+import { error } from '../utils/log'
+import { getKeys as getKeysQuery } from '../queries'
 
-const query = `query getKeys($storeId: ID!) {
-  keys(storeId: $storeId) {
-    client_id
-    client_secret
-  }
-}`
-
-module.exports = async options => {
+export default async options => {
   const storeId = options.id || (await config.get('activeStoreId'))
 
   if (!storeId) {
@@ -20,7 +14,7 @@ module.exports = async options => {
   }
 
   debug(`Fetching all API keys for store ${storeId}`)
-  const { keys } = await moltin.request(query, { storeId })
+  const { keys } = await moltin.request(getKeysQuery, { storeId })
 
   debug('Creating table')
   const table = new Table({

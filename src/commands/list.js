@@ -1,9 +1,7 @@
-const Table = require('cli-table')
-const debug = require('debug')('moltin')
+import Table from 'cli-table'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { error } = require('../utils/log')
+import debug from '../utils/debugger'
+import moltin from '../utils/moltin'
 
 const query = `query {
   stores {
@@ -12,7 +10,7 @@ const query = `query {
   }
 }`
 
-module.exports = async options => {
+export default async options => {
   debug(`Fetching all stores`)
   const { stores } = await moltin.request(query)
 

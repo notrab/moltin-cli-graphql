@@ -1,28 +1,14 @@
-const prompts = require('prompts')
-const Table = require('cli-table')
-const debug = require('debug')('moltin')
+import prompts from 'prompts'
+import Table from 'cli-table'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { error, info } = require('../utils/log')
+import debug from '../utils/debugger'
+import moltin from '../utils/moltin'
+import config from '../utils/config'
+import { error, info } from '../utils/log'
+import { getKeys as getKeysQuery } from '../queries'
+import { createToken as createTokenMutation } from '../mutations'
 
-const query = `query getKeys($storeId: ID!) {
-  keys(storeId: $storeId) {
-    client_id
-    client_secret
-  }
-}`
-
-const mutation = `mutation getToken($client_id: String!, $client_secret: String, $grant_type: GRANT_TYPE) {
-  createToken(client_id: $client_id, client_secret: $client_secret, grant_type: $grant_type) {
-    identifier
-    access_token
-    expires
-    expires_in
-  }
-}`
-
-module.exports = async options => {
+export default async options => {
   prompts.inject(options)
 
   const storeId = options.id || (await config.get('activeStoreId'))
@@ -34,7 +20,7 @@ module.exports = async options => {
   debug(`Fetching all API keys for store ${storeId}`)
   const {
     keys: [{ client_id, client_secret }]
-  } = await moltin.request(query, { storeId })
+  } = await moltin.request(getKeysQuery, { storeId })
 
   if (!client_id || !client_secret) {
     error('Unable to get your API keys')
@@ -59,7 +45,7 @@ module.exports = async options => {
     process.exit(0)
   }
 
-  const { createToken } = await moltin.request(mutation, {
+  const { createToken } = await moltin.request(createTokenMutation, {
     grant_type,
     client_id,
     ...(grant_type === 'client_credentials' && { client_secret })

@@ -1,21 +1,12 @@
-const Table = require('cli-table')
-const debug = require('debug')('moltin')
+import Table from 'cli-table'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { error } = require('../utils/log')
+import debug from '../utils/debugger'
+import moltin from '../utils/moltin'
+import config from '../utils/config'
+import { error } from '../utils/log'
+import { getStoreById as getStoreByIdQuery } from '../queries'
 
-const query = `query getStore($storeId: ID!) {
-  store(id: $storeId) {
-    id: noneUuid
-    name
-    users {
-      name
-    }
-  }
-}`
-
-module.exports = async options => {
+export default async options => {
   const storeId = options.id || (await config.get('activeStoreId'))
 
   if (!storeId) {
@@ -23,7 +14,7 @@ module.exports = async options => {
   }
 
   debug(`Fetching data for store with ID ${storeId}`)
-  const { store } = await moltin.request(query, { storeId })
+  const { store } = await moltin.request(getStoreByIdQuery, { storeId })
 
   debug('Creating table')
   const table = new Table({

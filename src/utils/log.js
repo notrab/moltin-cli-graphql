@@ -1,8 +1,8 @@
-const { green, red, gray } = require('chalk')
-const { pointer, tick, cross } = require('figures')
+import { green, red, gray } from 'chalk'
+import { pointer, tick, cross } from 'figures'
 
-module.exports.info = msg => console.log(`${gray(pointer)} ${msg}`)
+export const error = msg => console.log(`${red(cross)} ${msg}`)
 
-module.exports.success = msg => console.log(`${green(tick)} ${msg}`)
+export const info = msg => console.log(`${gray(pointer)} ${msg}`)
 
-module.exports.error = msg => console.log(`${red(cross)} ${msg}`)
+export const success = msg => console.log(`${green(tick)} ${msg}`)

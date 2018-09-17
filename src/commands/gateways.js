@@ -1,40 +1,14 @@
-const Table = require('cli-table')
-const debug = require('debug')('moltin')
-const { tick, cross } = require('figures')
-const { green, red } = require('chalk')
+import Table from 'cli-table'
+import { tick, cross } from 'figures'
+import { green, red } from 'chalk'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { error } = require('../utils/log')
+import debug from '../utils/debugger'
+import moltin from '../utils/moltin'
+import { getGateways as getGatewaysQuery } from '../queries'
 
-const query = `query getGateways {
-  gateways {
-    ... on Stripe {
-      name
-      enabled
-    }
-    ... on Braintree {
-      name
-      enabled
-    }
-    ... on CardConnect {
-      name
-      enabled
-    }
-    ... on Adyen {
-      name
-      enabled
-    }
-    ... on Manual {
-      name
-      enabled
-    }
-  }
-}`
-
-module.exports = async options => {
+export default async options => {
   debug(`Fetching all gateways`)
-  const { gateways } = await moltin.request(query)
+  const { gateways } = await moltin.request(getGatewaysQuery)
 
   debug('Creating table')
   const table = new Table({

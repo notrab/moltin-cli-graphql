@@ -1,22 +1,12 @@
-const prompts = require('prompts')
-const { cyan } = require('chalk')
+import prompts from 'prompts'
+import { cyan } from 'chalk'
 
-const moltin = require('../utils/moltin')
-const config = require('../utils/config')
-const { success, info, error } = require('../utils/log')
+import moltin from '../utils/moltin'
+import config from '../utils/config'
+import { success, info, error } from '../utils/log'
+import { register as registerMutation } from '../mutations'
 
-const mutation = `mutation register($name: String!, $email: String!, $password: String!, $company: String) {
-  register(name: $name, email: $email, password: $password, company: $company) {
-    accessToken: access_token
-    refreshToken: refresh_token
-    user {
-      name
-      email
-    }
-  }
-}`
-
-module.exports = async options => {
+export default async options => {
   prompts.inject(options)
 
   const { name, email, password, confirm } = await prompts([
@@ -38,7 +28,7 @@ module.exports = async options => {
     {
       type: 'confirm',
       name: 'confirm',
-      message: (prev, values) =>
+      message: (_, values) =>
         `You are about to signup to Moltin as ${cyan(
           values.name
         )} using the email ${cyan(values.email)} - Are you sure?`,
@@ -59,7 +49,7 @@ module.exports = async options => {
   debug('Running mutation to register user')
   const {
     register: { accessToken, refreshToken, user }
-  } = await moltin.request(mutation, { name, email, password })
+  } = await moltin.request(registerMutation, { name, email, password })
 
   debug('Setting user config')
   await config.set({
